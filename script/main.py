@@ -23,6 +23,7 @@ def InitLogging():
         filename='{}/../logs_{}'.format(
             os.path.dirname(os.path.realpath(__file__)),
             now.strftime('%Y_%m_%d_%H_%M_%S')),
+        filemode='w',
         format='%(asctime)s %(levelname)s %(message)s',
         level=logging.INFO
     )
