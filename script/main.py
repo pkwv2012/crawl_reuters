@@ -105,16 +105,22 @@ def Main(**kwargs):
                 start_date.strftime("%Y/%m/%d"),
                 key)
             print(q)
-            logging.info('date={}||key_word=\'{}\'\n'.format(
+            logging.info('info:date={}||key_word=\'{}\'\n'.format(
                 start_date.strftime("%Y-%m-%d"),
                 key.lower()))
-            for url in mg.search_url(query=q, language='en', pause=random.randint(5, 30)):
-                if 'reuters' not in url or start_date.strftime('%Y%m%d') not in url:
-                    continue;
-                print(url)
-                DownloadFromReuters(
-                    os.path.join(output_dir, start_date.strftime('%Y_%m_%d')),
-                    url)
+            try:
+                for url in mg.search_url(query=q, language='en', pause=random.randint(5, 30)):
+                    if 'reuters' not in url or start_date.strftime('%Y%m%d') not in url:
+                        continue;
+                    print(url)
+                    DownloadFromReuters(
+                        os.path.join(output_dir, start_date.strftime('%Y_%m_%d')),
+                        url)
+            except ValueError as e:
+                logging.error('value error:date={}||keyword={}'.format(
+                    start_date.strftime("%Y-%m-%d"),
+                    key.lower()
+                ))
         start_date += timedelta(days=1)
 
 
