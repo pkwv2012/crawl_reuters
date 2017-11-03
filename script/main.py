@@ -19,11 +19,9 @@ PROXIES = [{
 
 def InitLogging():
     now = datetime.now()
-    dir_of_file = os.path.dirname(__file__)
-    print(dir_of_file)
     logging.basicConfig(
         filename='{}/../logs_{}'.format(
-            dir_of_file,
+            os.path.dirname(os.path.realpath(__file__)),
             now.strftime('%Y_%m_%d_%H_%M_%S')),
         format='%(asctime)s %(levelname)s %(message)s',
         level=logging.INFO
