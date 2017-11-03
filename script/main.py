@@ -19,15 +19,17 @@ PROXIES = [{
 
 def InitLogging():
     now = datetime.now()
-    logging.basicConfig(
-        filename='{}/../logs_{}'.format(
-            os.path.dirname(os.path.realpath(__file__)),
-            now.strftime('%Y_%m_%d_%H_%M_%S')),
-        filemode='w',
-        format='%(asctime)s %(levelname)s %(message)s',
-        level=logging.INFO
-    )
-    logging.info('begin crawling')
+    global logger
+    logger = logging.getLogger('reuters_monitor')
+    logger.setLevel(logging.DEBUG)
+    print(os.path.realpath(__file__))
+    reuters_handler = logging.FileHandler(os.path.join(
+        os.path.dirname(os.path.realpath(__file__)),
+        '../logs_{}'.format(now.strftime("%Y_%m_%d_%H_%M_%S"))
+    ))
+    formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+    reuters_handler.setFormatter(formatter)
+    logger.addHandler(reuters_handler)
 
 # key words used in searching
 keys_file = '/path/to/key_file'
@@ -74,7 +76,7 @@ def DownloadFromReuters(output_dir, url):
 
     head_list = [title, editor, timestamp, url]
     filename = url[url.rfind('/') + 1:]
-    logging.info('outpur_file={}'.format(os.path.join(output_dir, filename)))
+    logger.info('outpur_file={}'.format(os.path.join(output_dir, filename)))
     with open(os.path.join(output_dir, filename), 'w') as fout:
         for item in head_list:
             fout.write('-- {}\n'.format(item))
@@ -101,13 +103,14 @@ def Main(**kwargs):
 
     output_dir = kwargs['output_dir']
     mg = MagicGoogle(PROXIES)
+    global logger
     while start_date < end_date:
         for key in key_list:
             q = 'www.reuters.com/article/{} {}'.format(
                 start_date.strftime("%Y/%m/%d"),
                 key)
             print(q)
-            logging.info('info:date={}||key_word=\'{}\'\n'.format(
+            logger.info('info:date={}||key_word=\'{}\'\n'.format(
                 start_date.strftime("%Y-%m-%d"),
                 key.lower()))
             try:
@@ -119,7 +122,7 @@ def Main(**kwargs):
                         os.path.join(output_dir, start_date.strftime('%Y_%m_%d')),
                         url)
             except ValueError as e:
-                logging.error('value error:date={}||keyword={}'.format(
+                logger.error('value error:date={}||keyword={}'.format(
                     start_date.strftime("%Y-%m-%d"),
                     key.lower()
                 ))
@@ -142,6 +145,7 @@ if __name__ == '__main__':
             print(config)
             Main(**config)
         except yaml.YAMLError as e:
-            logging.error("yaml parsing error {}".format(e))
+            global logger
+            logger.error("yaml parsing error {}".format(e))
             sys.exit(-2)
 
