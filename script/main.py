@@ -20,12 +20,15 @@ PROXIES = [{
 def InitLogging():
     now = datetime.now()
     dir_of_file = os.path.dirname(__file__)
+    print(dir_of_file)
     logging.basicConfig(
         filename='{}/../logs_{}'.format(
             dir_of_file,
             now.strftime('%Y_%m_%d_%H_%M_%S')),
-        format='%(asctime)-15s '
+        format='%(asctime)s %(levelname)s %(message)s',
+        level=logging.INFO
     )
+    logging.info('begin crawling')
 
 # key words used in searching
 keys_file = '/path/to/key_file'
