@@ -1,0 +1,4 @@
+start_date=2013-01-01
+end_date=2017-02-01
+output_dir=/home/burk/quant/reuters/news
+keywords_file=/home/burk/quant/reuters/keywords
