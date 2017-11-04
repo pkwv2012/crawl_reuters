@@ -126,6 +126,11 @@ def Main(**kwargs):
                     start_date.strftime("%Y-%m-%d"),
                     key.lower()
                 ))
+            except TypeError as e:
+                logger.error('type error:date={}||keyword={}'.format(
+                    start_date.strftime("%Y-%m-%d"),
+                    key.lower()
+                ))
         start_date += timedelta(days=1)
 
 
