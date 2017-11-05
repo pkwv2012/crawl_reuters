@@ -6,11 +6,14 @@ import pprint
 import random
 import requests
 import sys
+import time
 import yaml
 
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
+from google_search import GoogleSearch
 from MagicGoogle import MagicGoogle
+from selenium import webdriver
 
 PROXIES = [{
     'http': 'http://lcq:lcq123@162.105.146.128:65434',
@@ -104,6 +107,7 @@ def Main(**kwargs):
     output_dir = kwargs['output_dir']
     mg = MagicGoogle(PROXIES)
     global logger
+    searcher = GoogleSearch(logger)
     while start_date < end_date:
         for key in key_list:
             q = 'www.reuters.com/article/{} {}'.format(
@@ -113,24 +117,17 @@ def Main(**kwargs):
             logger.info('info:date={}||key_word=\'{}\'\n'.format(
                 start_date.strftime("%Y-%m-%d"),
                 key.lower()))
-            try:
-                for url in mg.search_url(query=q, language='en', pause=random.randint(5, 30)):
-                    if 'reuters' not in url or start_date.strftime('%Y%m%d') not in url:
-                        continue;
-                    print(url)
-                    DownloadFromReuters(
-                        os.path.join(output_dir, start_date.strftime('%Y_%m_%d')),
-                        url)
-            except ValueError as e:
-                logger.error('value error:date={}||keyword={}'.format(
-                    start_date.strftime("%Y-%m-%d"),
-                    key.lower()
-                ))
-            except TypeError as e:
-                logger.error('type error:date={}||keyword={}'.format(
-                    start_date.strftime("%Y-%m-%d"),
-                    key.lower()
-                ))
+            reuters_url = searcher.search(query=q)
+            print(reuters_url)
+            for url in reuters_url:
+                if start_date.strftime('%Y%m%d') not in url:
+                    continue;
+                print(url)
+                DownloadFromReuters(
+                    os.path.join(output_dir, start_date.strftime('%Y_%m_%d')),
+                    url)
+
+            time.sleep(random.randint(5, 30))
         start_date += timedelta(days=1)
 
 
