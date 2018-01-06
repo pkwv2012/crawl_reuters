@@ -24,7 +24,7 @@ def InitLogging():
     now = datetime.now()
     global logger
     logger = logging.getLogger('reuters_monitor')
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
     print(os.path.realpath(__file__))
     reuters_handler = logging.FileHandler(os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
@@ -65,11 +65,14 @@ def DownloadFromReuters(output_dir, url):
     else:
         title = None
 
-    body = soup.findAll('div', {'class': 'ArticleBody_body_2ECha'})
-    if len(body) > 0:
-        body = body[0].text
-    else:
-        body = None
+    body_class_list = ['StandardArticleBody_body_1gnLA', 'ArticleBody_body_2ECha']
+    for body_class in body_class_list:
+        body = soup.findAll('div', {'class': body_class})
+        if len(body) > 0:
+            body = body[0].text
+            break
+        else:
+            body = None
 
     editor = soup.findAll('div', {'class': 'Attribution_attribution_o4ojT'})
     if len(editor) > 0:
@@ -127,7 +130,7 @@ def Main(**kwargs):
                     os.path.join(output_dir, start_date.strftime('%Y_%m_%d')),
                     url)
 
-            time.sleep(random.randint(5, 30))
+            time.sleep(random.randint(60, 120))
         start_date += timedelta(days=1)
 
 
