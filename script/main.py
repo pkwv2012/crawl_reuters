@@ -83,6 +83,8 @@ def DownloadFromReuters(output_dir, url):
     head_list = [title, editor, timestamp, url]
     filename = url[url.rfind('/') + 1:]
     logger.info('outpur_file={}'.format(os.path.join(output_dir, filename)))
+    if filename == '':
+        return
     with open(os.path.join(output_dir, filename), 'w') as fout:
         for item in head_list:
             fout.write('-- {}\n'.format(item))
@@ -112,6 +114,7 @@ def Main(**kwargs):
     global logger
     searcher = GoogleSearch(logger)
     while start_date < end_date:
+        """
         for key in key_list:
             q = 'www.reuters.com/article/{} {}'.format(
                 start_date.strftime("%Y/%m/%d"),
@@ -131,6 +134,21 @@ def Main(**kwargs):
                     url)
 
             time.sleep(random.randint(60, 120))
+        """
+        url = 'https://www.reuters.com/resources/archive/us/{}.html'.format(
+            start_date.strftime("%Y%m%d")
+        )
+        res = requests.get(url=url, proxies=PROXIES[0])
+        soup = BeautifulSoup(res.text)
+        ref_list = [h.a['href'] for h in soup.find_all("div", {'class': 'headlineMed'})]
+        for ref in ref_list:
+            pprint.pprint(ref)
+            DownloadFromReuters(
+                os.path.join(output_dir, start_date.strftime("%Y_%m_%d")),
+                url=ref
+            )
+            time.sleep(random.randint(1, 2))
+        time.sleep(random.randint(20, 120))
         start_date += timedelta(days=1)
 
 
