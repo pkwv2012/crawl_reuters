@@ -142,12 +142,15 @@ def Main(**kwargs):
         soup = BeautifulSoup(res.text)
         ref_list = [h.a['href'] for h in soup.find_all("div", {'class': 'headlineMed'})]
         for ref in ref_list:
+            if 'videoStory' in ref:
+                # filter video news
+                continue
             pprint.pprint(ref)
             DownloadFromReuters(
                 os.path.join(output_dir, start_date.strftime("%Y_%m_%d")),
                 url=ref
             )
-            time.sleep(random.randint(1, 2))
+            # time.sleep(random.randint(1, 2))
         time.sleep(random.randint(20, 120))
         start_date += timedelta(days=1)
 
