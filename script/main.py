@@ -5,6 +5,7 @@ import os
 import pprint
 import random
 import requests
+import requests.exceptions
 import sys
 import time
 import yaml
@@ -146,10 +147,13 @@ def Main(**kwargs):
                 # filter video news
                 continue
             pprint.pprint(ref)
-            DownloadFromReuters(
-                os.path.join(output_dir, start_date.strftime("%Y_%m_%d")),
-                url=ref
-            )
+            try:
+                DownloadFromReuters(
+                    os.path.join(output_dir, start_date.strftime("%Y_%m_%d")),
+                    url=ref
+                )
+            except requests.exceptions.ProxyError:
+                logger.error("ProxyError||url={}".format(ref))
             # time.sleep(random.randint(1, 2))
         time.sleep(random.randint(20, 120))
         start_date += timedelta(days=1)
